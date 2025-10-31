@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Kalkulator Weton – Analisa Jodoh & Hari Baik</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Export PDF libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    :root{
+      --coklat-950:#2b2018; --coklat-900:#3d2b1f; --coklat-800:#4e342e; --coklat-700:#6b4226; --coklat-600:#8d6e63;
+      --coklat-300:#d7ccc8; --coklat-200:#efebe9; --coklat-100:#f7f2ee; --amber:#f6d087;
+    }
+    body{ background:var(--coklat-100); color:var(--coklat-900); }
+    .bg-batik {
+      background:
+        radial-gradient(circle at 8% 10%, rgba(246,208,135,.18) 0 20%, transparent 21%),
+        radial-gradient(circle at 92% 90%, rgba(246,208,135,.18) 0 20%, transparent 21%);
+    }
+    .kartu-batik {
+      position: relative;
+      border: 2px solid var(--amber);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(61,43,31,.12);
+      overflow: hidden;
+      background: #fff;
+      isolation:isolate;
+    }
+    .kartu-batik.dark { background:#1f1b18; border-color:#d8b373; }
+    .kartu-batik::before{
+      content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(ellipse at top left, rgba(246,208,135,.16), transparent 60%),
+        radial-gradient(ellipse at bottom right, rgba(246,208,135,.16), transparent 60%);
+    }
+    .ornamen-wrap{ position:relative; }
+    .ornamen-top-left, .ornamen-bottom-right{
+      position:absolute; width:100px; height:100px; opacity:.35; z-index:1; pointer-events:none;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.06));
+    }
+    .ornamen-top-left{ top:-6px; left:-6px; }
+    .ornamen-bottom-right{ bottom:-6px; right:-6px; transform: rotate(180deg); }
+
+    .btn-coklat{ background: var(--coklat-700); color:#fff; }
+    .btn-coklat:hover{ background: var(--coklat-800); }
+    .btn-out{ border:1px solid var(--coklat-700); color: var(--coklat-700); }
+    .btn-out:hover{ background: var(--coklat-700); color:#fff; }
+
+    .icon-btn{
+      width:40px; height:40px; display:grid; place-items:center; border-radius:999px;
+      border:1px solid rgba(61,43,31,.2); background:#fff;
+    }
+    .icon-btn:hover{ background:#fff7ee; }
+    .dark .icon-btn{ background:#2a241f; border-color:#6b5a4a; }
+    .dark .icon-btn:hover{ background:#3a3028; }
+
+    .pdf-stable *{
+      transform:none !important; filter:none !important; backdrop-filter:none !important;
+      -webkit-transform:none !important; -webkit-filter:none !important;
+    }
+    .pdf-stable{ box-shadow:none !important; }
+    @media (max-width: 420px){
+      .ornamen-top-left, .ornamen-bottom-right{ width:78px; height:78px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SVG defs -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="gradBatik" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#f6d087"/>
+        <stop offset="100%" stop-color="#e1b96f"/>
+      </linearGradient>
+      <g id="motifBunga">
+        <circle cx="20" cy="20" r="12" fill="url(#gradBatik)" stroke="#6b4226" stroke-width="2"/>
+        <path d="M20 5 L24 16 L36 20 L24 24 L20 35 L16 24 L4 20 L16 16 Z" fill="none" stroke="#6b4226" stroke-width="2"/>
+      </g>
+      <g id="wayangHead">
+        <path d="M20 5 C10 10, 8 22, 20 28 C32 22,30 10,20 5 Z" fill="url(#gradBatik)" stroke="#3d2b1f" stroke-width="2"/>
+        <circle cx="17" cy="17" r="2.5" fill="#3d2b1f"/>
+      </g>
+    </defs>
+  </svg>
+
+  <div class="max-w-5xl mx-auto px-3 sm:px-4">
+    <!-- HEADER -->
+    <header class="flex items-center justify-between py-2">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-full grid place-content-center border border-[var(--amber)] bg-batik">
+          <svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><use href="#wayangHead"></use></svg>
+        </div>
+        <span class="text-base font-semibold tracking-tight">Kalkulator Weton</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Tombol refresh (ikon) -->
+        <button id="btnRefresh" class="icon-btn" aria-label="Muat ulang">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.65 6.35A7.95 7.95 0 0012 4a8 8 0 108 8h-2a6 6 0 11-6-6c1.66 0 3.14.67 4.22 1.76L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+        </button>
+        <!-- Toggle tema -->
+        <button id="toggleTema" class="icon-btn" aria-label="Ganti tema">
+          <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-[var(--coklat-900)] dark:hidden">
+            <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+          </svg>
+          <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#f6d087" class="hidden dark:block">
+            <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42zM1 13h3v-2H1v2zm10 10h2v-3h-2v3zM4.95 19.07l1.41 1.41 1.8-1.79-1.41-1.41-1.8 1.79zM13 1h-2v3h2V1zm7.05 4.93l-1.41-1.41-1.8 1.79 1.41 1.41 1.8-1.79zM20 11v2h3v-2h-3zm-8 2a3 3 0 110-6 3 3 0 010 6zm7.05 6.07l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- FORM -->
+    <form id="wetonForm" class="mt-3 grid md:grid-cols-2 gap-4 sm:gap-6">
+      <div class="space-y-3">
+        <label class="block text-sm font-semibold" for="namaPria">Nama Pria</label>
+        <input id="namaPria" type="text" class="w-full p-3 rounded-lg border bg-white/80" placeholder="Masukkan nama pria" required>
+        <label class="block text-sm font-semibold" for="tglPria">Tanggal Lahir Pria</label>
+        <input id="tglPria" type="date" class="w-full p-3 rounded-lg border bg-white/80" required>
+      </div>
+      <div class="space-y-3">
+        <label class="block text-sm font-semibold" for="namaWanita">Nama Wanita</label>
+        <input id="namaWanita" type="text" class="w-full p-3 rounded-lg border bg-white/80" placeholder="Masukkan nama wanita" required>
+        <label class="block text-sm font-semibold" for="tglWanita">Tanggal Lahir Wanita</label>
+        <input id="tglWanita" type="date" class="w-full p-3 rounded-lg border bg-white/80" required>
+      </div>
+      <div class="md:col-span-2 flex flex-wrap gap-3 justify-center">
+        <button type="submit" class="px-6 py-2 rounded-lg text-white font-semibold btn-coklat">Proses</button>
+        <button type="button" id="btnReset" class="px-6 py-2 rounded-lg font-semibold btn-out">Reset</button>
+      </div>
+    </form>
+
+    <!-- HASIL -->
+    <section id="hasil" class="mt-5 hidden">
+      <div class="ornamen-wrap">
+        <svg class="ornamen-top-left" viewBox="0 0 40 40" aria-hidden="true"><use href="#motifBunga"></use></svg>
+        <svg class="ornamen-bottom-right" viewBox="0 0 40 40" aria-hidden="true"><use href="#motifBunga"></use></svg>
+
+        <div id="hasilCard" class="kartu-batik p-5 sm:p-6 md:p-8">
+          <div class="relative z-10 flex items-center gap-3 mb-4">
+            <div class="shrink-0 rounded-full w-12 h-12 grid place-content-center border border-[var(--amber)] bg-batik">
+              <svg viewBox="0 0 40 40" width="24" height="24" aria-hidden="true"><use href="#wayangHead"></use></svg>
+            </div>
+            <div>
+              <div class="text-xl md:text-2xl font-extrabold" style="color:var(--coklat-900)">Kalkulator Weton</div>
+              <div class="text-[11px] opacity-80">Analisa Jodoh & Hari Baik</div>
+            </div>
+          </div>
+
+          <div class="relative z-10 grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="font-bold text-lg" style="color:var(--coklat-900)">👤 Data Pria</h3>
+              <div id="dataPria" class="text-sm md:text-base mt-1 space-y-1"></div>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg" style="color:var(--coklat-900)">👩 Data Wanita</h3>
+              <div id="dataWanita" class="text-sm md:text-base mt-1 space-y-1"></div>
+            </div>
+          </div>
+
+          <hr class="my-5 border-[var(--amber)]/60 relative z-10" />
+
+          <div class="relative z-10">
+            <h3 class="font-bold text-lg" style="color:var(--coklat-900)">💑 Kecocokan Jodoh</h3>
+            <div id="kecocokan" class="mt-2 text-sm md:text-base leading-relaxed"></div>
+          </div>
+
+          <div class="mt-6 relative z-10">
+            <h3 class="font-bold text-lg" style="color:var(--coklat-900)">🧩 Analisa Kombinasi Spesifik</h3>
+            <div id="analisaKombinasi" class="mt-2 text-sm md:text-base leading-relaxed"></div>
+          </div>
+
+          <div class="mt-6 relative z-10">
+            <h3 class="font-bold text-lg" style="color:var(--coklat-900)">📅 Saran Hari / Pasaran Nikah</h3>
+            <ul id="saranHari" class="mt-2 list-disc list-inside text-sm md:text-base leading-relaxed space-y-1"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button id="btnCetak" class="px-5 py-2 rounded-lg text-white font-semibold" style="background:var(--coklat-700)">Unduh PDF</button>
+        <button id="btnShare" class="px-5 py-2 rounded-lg text-white font-semibold" style="background:linear-gradient(90deg,#4e342e,#6b4226)">Bagikan</button>
+        <button id="btnWA" class="px-5 py-2 rounded-lg text-white font-semibold" style="background:#2ea043">Bagikan ke WhatsApp</button>
+        <button id="btnCopy" class="px-5 py-2 rounded-lg font-semibold btn-out">Salin Ringkasan</button>
+      </div>
+      <p id="shareHint" class="mt-2 text-xs opacity-70"></p>
+    </section>
+  </div>
+
+<script>
+/* ===== Tema ===== */
+const root = document.documentElement;
+document.getElementById('toggleTema').addEventListener('click', () => {
+  const card = document.getElementById('hasilCard');
+  const isDark = root.classList.toggle('dark');
+  if (card) card.classList.toggle('dark', isDark);
+  document.body.style.background = isDark ? '#1b1714' : 'var(--coklat-100)';
+  document.body.style.color = isDark ? '#f6e9d7' : 'var(--coklat-900)';
+});
+
+/* ===== Refresh icon ===== */
+document.getElementById('btnRefresh').addEventListener('click', ()=> location.reload());
+
+/* ===== Data dasar weton & karakter ===== */
+const PASARAN = ["Legi","Pahing","Pon","Wage","Kliwon"];
+const HARI     = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const NEPTU_HARI     = {Minggu:5, Senin:4, Selasa:3, Rabu:7, Kamis:8, Jumat:6, Sabtu:9};
+const NEPTU_PASARAN  = {Legi:5, Pahing:9, Pon:7, Wage:4, Kliwon:8};
+
+const KARAKTER_HARI = {
+  "Minggu":"berjiwa bebas, optimis, senang tampil di depan.",
+  "Senin":"tenang, penuh pertimbangan, peduli detail.",
+  "Selasa":"tegas, berenergi, kadang terburu-buru.",
+  "Rabu":"logis, komunikatif, solutif.",
+  "Kamis":"bijak, terstruktur, perfeksionis.",
+  "Jumat":"hangat, romantis, mudah bekerja sama.",
+  "Sabtu":"kuat pendirian, setia, sedikit kaku."
+};
+const KARAKTER_PASARAN = {
+  "Legi":"penyayang, damai, mengutamakan keharmonisan.",
+  "Pahing":"ambisius, daya juang tinggi, cenderung dominan.",
+  "Pon":"stabil, rasional, suka keteraturan.",
+  "Wage":"introvert, reflektif, sensitif.",
+  "Kliwon":"intuisi tajam, spiritual, mudah berempati."
+};
+
+/* ===== Kategori hasil jodoh ===== */
+const KATEGORI = [
+  {keys:[7,14,21,28,35], name:"🟥 Pegat (Pisah/Cerai)", html:`<p><strong>Makna:</strong> Pegat berarti “pisah”. Menunjukkan potensi besar pertengkaran, krisis rumah tangga, hingga perceraian.</p>
+    <p class='mt-2'><strong>Penyebab spesifik:</strong></p>
+    <ul class='list-disc list-inside'>
+      <li>Perbedaan prinsip hidup mencolok.</li>
+      <li>Emosi tidak stabil, sama-sama keras kepala.</li>
+      <li>Energi batin tidak menyatu, menimbulkan ketegangan.</li>
+      <li>Ketidakseimbangan peran (satu dominan, satu mengalah).</li>
+      <li>Gangguan pihak ketiga (perselingkuhan).</li>
+      <li>Rezeki rumah tangga cenderung seret.</li>
+    </ul>
+    <p class='mt-2'><strong>Solusi tradisional:</strong> Ruwatan/tolak bala (siraman, tumpengan weton), memperkuat komunikasi dan spiritualitas bersama.</p>`},
+  {keys:[8,15,22,29], name:"🟩 Ratu (Raja & Ratu)", html:`<p><strong>Makna:</strong> Pasangan seperti raja dan ratu; sangat serasi lahir batin.</p>
+    <ul class='list-disc list-inside mt-2'>
+      <li>Energi spiritual sangat harmonis.</li>
+      <li>Saling menguatkan dan memahami secara alami.</li>
+      <li>Cinta dalam dan langgeng; rezeki terbuka lebar.</li>
+      <li>Sering dianggap pasangan idaman.</li>
+    </ul>
+    <p class='mt-2'><strong>Catatan:</strong> Tetap rendah hati agar tidak muncul ketimpangan peran.</p>`},
+  {keys:[9,16,23,30], name:"🟨 Jodoh", html:`<p><strong>Makna:</strong> Jodoh alamiah, berjodoh secara spiritual maupun nasib.</p>
+    <ul class='list-disc list-inside mt-2'>
+      <li>Komunikasi nyambung.</li>
+      <li>Karakter saling menutupi kekurangan.</li>
+      <li>Potensi anak-anak yang membawa berkah.</li>
+      <li>Sering dipertemukan oleh “takdir”.</li>
+    </ul>
+    <p class='mt-2'><strong>Tantangan:</strong> Hambatan eksternal (ekonomi/status) bisa muncul; bukan masalah batin.</p>`},
+  {keys:[10,17,24,31], name:"🟪 Topo (Bertapa/Ujian Hidup)", html:`<p><strong>Makna:</strong> Rumah tangga penuh ujian; seperti sedang “bertapa”.</p>
+    <ul class='list-disc list-inside mt-2'>
+      <li>Ujian ekonomi, kesehatan, jarak, atau godaan luar.</li>
+      <li>Kalau tidak saling dukung, bisa saling menjatuhkan.</li>
+      <li>Anak sulit diatur bila orang tua tidak kompak.</li>
+    </ul>
+    <p class='mt-2'><strong>Filosofi:</strong> Mampu melewati ujian → naik derajat spiritual & rezeki terbuka.</p>`},
+  {keys:[11,18,25,32], name:"🟦 Tinari (Untung/Beruntung)", html:`<p><strong>Makna:</strong> Pasangan yang sering mendapat keberuntungan.</p>
+    <ul class='list-disc list-inside mt-2'>
+      <li>Urusan lancar, rezeki relatif mudah.</li>
+      <li>Jarang sakit-sakitan; anak membawa hoki.</li>
+    </ul>
+    <p class='mt-2'><strong>Catatan:</strong> Jangan terlena; tetap jaga pondasi spiritual & komunikasi.</p>`},
+  {keys:[12,19,26,33], name:"🟧 Padu (Bertengkar tapi tetap)", html:`<p><strong>Makna:</strong> Sering terjadi konflik kecil, tetapi tetap bersama.</p>
+    <ul class='list-disc list-inside mt-2'>
+      <li>Beda prinsip & ego tinggi → adu argumen.</li>
+      <li>Ikatan batin kuat; sulit berpisah.</li>
+    </ul>
+    <p class='mt-2'><strong>Saran:</strong> Latih sabar, komunikasi terbuka, dan manajemen emosi.</p>`},
+  {keys:[13,20,27,34], name:"🟥 Sujanan (Selingkuh/Dikhianati)", html:`<p><strong>Makna:</strong> Ada potensi pengkhianatan/orang ketiga.</p>
+    <ul class='list-disc list-inside mt-2'>
+      <li>Ketidakpuasan emosional/kurang dihargai.</li>
+      <li>Energi batin tidak sinkron → mudah curiga/posesif.</li>
+    </ul>
+    <p class='mt-2'><strong>Solusi:</strong> Kejujuran, terapi komunikasi, dan ruwatan weton bersama.</p>`}
+];
+
+/* ===== Kombinasi spesifik contoh ===== */
+const KOMBO_SPESIFIK = {
+  "Wage-Pahing":"Pribadi analitis & pendiam (Wage) bertemu energi kepemimpinan & ambisi (Pahing). Kuat di strategi; perlu melunak saat menyampaikan pendapat.",
+  "Pahing-Wage":"Sosok dominan & visioner (Pahing) berpadu pasangan reflektif (Wage). Cocok untuk rencana jangka panjang; hindari mengatur berlebihan.",
+  "Legi-Kliwon":"Kelembutan & harmoni (Legi) dipadu intuisi kuat (Kliwon). Hangat & religius.",
+  "Pon-Wage":"Rasional & teratur (Pon) bertemu pendiam yang sensitif (Wage). Stabil, tapi rawan miskom jika perasaan dipendam.",
+  "Kliwon-Pahing":"Intuisi kuat (Kliwon) + ambisi tinggi (Pahing). Daya dorong besar; seimbangkan batin & target duniawi."
+};
+
+/* ===== Perhitungan (UTC-safe) ===== */
+const ANCHOR_DATE_UTC = Date.UTC(2025, 8, 22); // 22 Sep 2025 = Senin Pahing
+const ANCHOR_PASARAN  = "Pahing";
+const ANCHOR_INDEX    = PASARAN.indexOf(ANCHOR_PASARAN);
+const mod = (n,m)=>((n%m)+m)%m;
+
+function getPasaranUTC(y,m,d){
+  const tUTC = Date.UTC(y, m-1, d);
+  const diffDays = Math.floor((tUTC - ANCHOR_DATE_UTC)/86400000);
+  return PASARAN[ mod(ANCHOR_INDEX + diffDays, 5) ];
+}
+function hitungWetonAkurat(y,m,d){
+  const tUTC = Date.UTC(y, m-1, d);
+  const dt = new Date(tUTC);
+  const hari = HARI[dt.getUTCDay()];
+  const pasaran = getPasaranUTC(y, m, d);
+  const neptu = NEPTU_HARI[hari] + NEPTU_PASARAN[pasaran];
+  return { hari, pasaran, neptu };
+}
+function hitungWetonFromInput(dateStr){
+  const [yy, mm, dd] = dateStr.split("-").map(Number);
+  return hitungWetonAkurat(yy, mm, dd);
+}
+
+/* ===== Narasi & saran ===== */
+function kategoriDariTotal(total){
+  for (const k of KATEGORI) if (k.keys.includes(total)) return k;
+  return {name:"(Tidak Diketahui)", html:"Penentuan kategori untuk total ini belum tersedia."};
+}
+function gabunganKarakter(h, p){
+  const hTone = {Minggu:"mandiri & ekspresif", Senin:"tenang & terukur", Selasa:"tegas & berani", Rabu:"logis & komunikatif", Kamis:"bijak & rapi", Jumat:"hangat & kooperatif", Sabtu:"setia & konsisten"}[h];
+  const pTone = {Legi:"pelembut suasana", Pahing:"pendorong ambisi", Pon:"penjaga stabilitas", Wage:"pendalam batin", Kliwon:"penuntun intuisi"}[p];
+  return `cenderung ${hTone}, dengan ${pTone}.`;
+}
+function karakterLengkap({hari, pasaran}){
+  return `Hari <strong>${hari}</strong>: ${KARAKTER_HARI[hari]}<br/>Pasaran <strong>${pasaran}</strong>: ${KARAKTER_PASARAN[pasaran]}<br/><em>Gabungan:</em> ${gabunganKarakter(hari, pasaran)}`;
+}
+function buatSaranHari(pria, wanita, total){
+  const katName = kategoriDariTotal(total).name;
+  const duet = `${pria.pasaran}-${wanita.pasaran}`;
+  const out = [];
+  const push = (h, alasan)=>out.push(`<li><strong>${h}</strong> — ${alasan}</li>`);
+
+  if (katName.includes("Ratu") || katName.includes("Jodoh") || katName.includes("Tinari")){
+    push("Jumat Legi", "Simbol harmoni & rezeki; cocok untuk pasangan yang selaras.");
+    push("Rabu Pahing", "Menjernihkan batin & memantapkan niat bersama.");
+  }
+  if (katName.includes("Topo"))  push("Kamis Pon", "Menstabilkan ujian lahir-batin; baik untuk komitmen panjang.");
+  if (katName.includes("Padu"))  push("Selasa Kliwon", "Energi tegas Selasa diseimbangkan keteduhan Kliwon, meredam ego.");
+  if (katName.includes("Sujanan")) push("Minggu Pahing", "Menguatkan komitmen & kejujuran; merapikan arah hubungan.");
+  if (katName.includes("Pegat")){
+    push("Jumat Legi", "Diyakini membawa berkah & kedamaian; dianjurkan didahului doa/ruwatan.");
+    push("Rabu Pahing", "Membersihkan energi tarik-tolak & meneguhkan niat.");
+  }
+  if (KOMBO_SPESIFIK[duet]) push("Kamis Kliwon", "Kombinasi batin-spiritual kuat; cocok untuk pasangan dengan dinamika batin mendalam.");
+  if (!out.length) push("Jumat Legi", "Hari populer untuk awal rumah tangga yang damai dan berkah.");
+  return out;
+}
+
+/* ===== Helper ===== */
+const $ = s=>document.querySelector(s);
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  $('#wetonForm').reset(); $('#hasil').classList.add('hidden');
+  $('#dataPria').innerHTML = ''; $('#dataWanita').innerHTML = '';
+  $('#kecocokan').innerHTML = ''; $('#analisaKombinasi').innerHTML = '';
+  $('#saranHari').innerHTML = ''; $('#shareHint').textContent = '';
+});
+
+/* ===== SUBMIT: render hasil ===== */
+document.getElementById('wetonForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+
+  const namaPria   = $('#namaPria').value.trim();
+  const namaWanita = $('#namaWanita').value.trim();
+  const tPria      = $('#tglPria').value;
+  const tWanita    = $('#tglWanita').value;
+
+  if (!namaPria || !namaWanita || !tPria || !tWanita){
+    alert('Lengkapi semua data.');
+    return;
+  }
+
+  // Hitung & render
+  const pria   = hitungWetonFromInput(tPria);
+  const wanita = hitungWetonFromInput(tWanita);
+  const total  = pria.neptu + wanita.neptu;
+  const kat    = kategoriDariTotal(total);
+
+  $('#dataPria').innerHTML = `
+    <div><strong>Nama:</strong> ${namaPria}</div>
+    <div><strong>Weton:</strong> ${pria.hari} ${pria.pasaran}</div>
+    <div><strong>Neptu:</strong> ${pria.neptu}</div>
+    <div class="mt-1">${karakterLengkap(pria)}</div>`;
+
+  $('#dataWanita').innerHTML = `
+    <div><strong>Nama:</strong> ${namaWanita}</div>
+    <div><strong>Weton:</strong> ${wanita.hari} ${wanita.pasaran}</div>
+    <div><strong>Neptu:</strong> ${wanita.neptu}</div>
+    <div class="mt-1">${karakterLengkap(wanita)}</div>`;
+
+  $('#kecocokan').innerHTML = `
+    <div class="font-semibold">${kat.name}</div>
+    <div class="mt-2">${kat.html}</div>
+    <div class="mt-2"><strong>Total Neptu:</strong> ${total}</div>`;
+
+  const duet = `${pria.pasaran}-${wanita.pasaran}`;
+  const analisaKhusus = KOMBO_SPESIFIK[duet] ||
+    "Belum ada analisa khusus untuk kombinasi ini. Gunakan prinsip umum: seimbangkan logika & rasa, serta jaga komunikasi.";
+  $('#analisaKombinasi').innerHTML = `<p><strong>${pria.pasaran} + ${wanita.pasaran}</strong>: ${analisaKhusus}</p>`;
+
+  const saran = buatSaranHari(pria, wanita, total);
+  $('#saranHari').innerHTML = saran.join('');
+
+  $('#hasil').classList.remove('hidden');
+  $('#shareHint').textContent = '';
+
+  window._ringkasanText =
+    `Kalkulator Weton\n\n`+
+    `Pria: ${namaPria} (${pria.hari} ${pria.pasaran}, neptu ${pria.neptu})\n`+
+    `Wanita: ${namaWanita} (${wanita.hari} ${wanita.pasaran}, neptu ${wanita.neptu})\n`+
+    `Total Neptu: ${total} → ${kat.name}\n`+
+    `Saran Hari: ` + saran.map(li => li.replace(/<[^>]+>/g,'')).join(' | ');
+});
+
+/* ===== PDF ===== */
+async function exportToPDFMultiPage(node){
+  const { jsPDF } = window.jspdf;
+  await new Promise(r=>requestAnimationFrame(r));
+  node.classList.add('pdf-stable');
+  const prevScrollY = window.scrollY; window.scrollTo(0,0);
+
+  const scaleBase = Math.max(2, Math.min(3, window.devicePixelRatio || 2));
+  const canvas = await html2canvas(node, {
+    scale: scaleBase, backgroundColor: '#ffffff', useCORS: true, logging: false,
+    windowWidth: document.documentElement.scrollWidth,
+    windowHeight: document.documentElement.scrollHeight
+  });
+
+  window.scrollTo(0, prevScrollY);
+  node.classList.remove('pdf-stable');
+
+  const pdf = new jsPDF({orientation:'p', unit:'pt', format:'a4'});
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  const margin = 24, headerH = 46, footerH = 22;
+  const usableH = pageH - headerH - footerH;
+  const imgW = pageW - margin*2;
+  const imgH = canvas.height * (imgW / canvas.width);
+
+  const writeHeaderFooter = (i) => {
+    pdf.setFillColor(247,242,238); pdf.rect(0,0,pageW,headerH,'F');
+    pdf.setTextColor(61,43,31); pdf.setFontSize(13);
+    pdf.text('Kalkulator Weton – Analisa Jodoh & Hari Baik', margin, headerH - 16);
+    pdf.setFontSize(9); pdf.setTextColor(120);
+    const ts = new Date().toLocaleString('id-ID');
+    pdf.text(`Dihasilkan • ${ts} • Hal ${i+1}`, margin, pageH - 8);
+  };
+
+  if (imgH <= usableH){
+    writeHeaderFooter(0);
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, headerH, imgW, imgH, '', 'FAST');
+    return pdf;
+  }
+
+  const pages = Math.ceil(imgH / usableH);
+  const pageCanvas = document.createElement('canvas');
+  const ctx = pageCanvas.getContext('2d');
+
+  for (let p=0; p<pages; p++){
+    if (p>0) pdf.addPage();
+    writeHeaderFooter(p);
+
+    const sy = Math.floor(p * usableH * (canvas.height / imgH));
+    const sHeight = Math.min(Math.floor(usableH * (canvas.height / imgH)), canvas.height - sy);
+    const sWidth = canvas.width;
+
+    pageCanvas.width = sWidth; pageCanvas.height = sHeight;
+    ctx.clearRect(0,0,sWidth,sHeight);
+    ctx.drawImage(canvas, 0, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
+
+    const segment = pageCanvas.toDataURL('image/jpeg', 0.92);
+    const segH = (sHeight / canvas.height) * imgH;
+    pdf.addImage(segment, 'JPEG', margin, headerH, imgW, segH, '', 'FAST');
+  }
+  return pdf;
+}
+document.getElementById('btnCetak').addEventListener('click', async ()=>{
+  const node = document.getElementById('hasilCard');
+  if (!node){ alert('Hitung hasil dulu ya.'); return; }
+  try{
+    const pdf = await exportToPDFMultiPage(node);
+    pdf.save('hasil-weton.pdf');
+  }catch(e){ console.error(e); alert('Gagal membuat PDF. Coba lagi.'); }
+});
+
+/* ===== Share ===== */
+document.getElementById('btnShare').addEventListener('click', async ()=>{
+  const text = window._ringkasanText || 'Hasil belum dihitung.';
+  if (navigator.share){
+    try{ await navigator.share({title:'Hasil Kalkulator Weton', text}); return; }catch(e){}
+  }
+  await navigator.clipboard.writeText(text);
+  document.getElementById('shareHint').textContent = 'Ringkasan disalin ke clipboard. Tempel di chat pilihan Anda.';
+});
+document.getElementById('btnWA').addEventListener('click', ()=>{
+  const text = encodeURIComponent(window._ringkasanText || 'Hasil belum dihitung.');
+  const url = `https://wa.me/?text=${text}`;
+  try{ window.open(url,'_blank'); }
+  catch(e){
+    navigator.clipboard.writeText(window._ringkasanText || '');
+    document.getElementById('shareHint').textContent = 'Tautan WhatsApp diblokir. Ringkasan disalin—tempel manual di WhatsApp.';
+  }
+});
+</script>
+</body>
+</html>
