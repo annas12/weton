@@ -5,12 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Kalkulator Weton – Analisa Jodoh & Hari Baik</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+// Jembatan ke Unity (aman jika dibuka di browser biasa)
+function unityBridge(action, payload = {}) {
+  try {
+    if (window.Unity && typeof window.Unity.call === "function") {
+      window.Unity.call(JSON.stringify({ action, payload }));
+    } else {
+      console.log("[UnityBridge] Unity belum siap.");
+    }
+  } catch (e) { console.log(e); }
+}
+</script>
+
   <!-- Export PDF libs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     :root{
-      --coklat-950:#2b2018; --coklat-900:#3d2b1f; --coklat-800:#4e342e; --coklat-700:#6b4226; --coklat-600:#8d6e63;
+      --coklat-950:#2b2018; --coklat-900:#3d2b1f; --coklat-800:#4e342e; --coklat-700:#6a4226; --coklat-600:#8d6e63;
       --coklat-300:#d7ccc8; --coklat-200:#efebe9; --coklat-100:#f7f2ee; --amber:#f6d087;
     }
     body{ background:var(--coklat-100); color:var(--coklat-900); }
@@ -354,7 +367,7 @@ function buatSaranHari(pria, wanita, total){
 /* ===== Helper ===== */
 const $ = s=>document.querySelector(s);
 document.getElementById('btnReset').addEventListener('click', ()=>{
-  $('#wetonForm').reset(); $('#hasil').classList.add('hidden');
+  $('#wetonForm').reset(); $('#hasil').classList.add('hidden'); unityBridge('showAd');
   $('#dataPria').innerHTML = ''; $('#dataWanita').innerHTML = '';
   $('#kecocokan').innerHTML = ''; $('#analisaKombinasi').innerHTML = '';
   $('#saranHari').innerHTML = ''; $('#shareHint').textContent = '';
@@ -414,6 +427,9 @@ document.getElementById('wetonForm').addEventListener('submit', (e)=>{
     `Wanita: ${namaWanita} (${wanita.hari} ${wanita.pasaran}, neptu ${wanita.neptu})\n`+
     `Total Neptu: ${total} → ${kat.name}\n`+
     `Saran Hari: ` + saran.map(li => li.replace(/<[^>]+>/g,'')).join(' | ');
+
+  // 🔸 Tampilkan iklan interstitial setelah klik Proses
+  unityBridge('showAd');
 });
 
 /* ===== PDF ===== */
@@ -484,6 +500,8 @@ document.getElementById('btnCetak').addEventListener('click', async ()=>{
   try{
     const pdf = await exportToPDFMultiPage(node);
     pdf.save('hasil-weton.pdf');
+    // 🔸 Tampilkan iklan setelah berhasil unduh PDF
+    unityBridge('showAd');
   }catch(e){ console.error(e); alert('Gagal membuat PDF. Coba lagi.'); }
 });
 
