@@ -111,28 +111,24 @@
     </svg>
 
     <div class="max-w-5xl mx-auto px-3 sm:px-4">
-        <!-- MENU -->
-        <div class="mt-3 grid grid-cols-2 gap-2">
-            <button type="button" id="menuKalkulator" class="px-4 py-2 rounded-lg text-sm font-semibold btn-coklat">🧮 Kalkulator Weton</button>
-            <button type="button" id="menuKalender" class="px-4 py-2 rounded-lg text-sm font-semibold btn-out">📆 Kalender Jawa</button>
-        </div>
-
         <!-- HEADER -->
-        <header class="flex items-center justify-between py-2">
-            <div class="flex items-center gap-2">
-                <div class="w-9 h-9 rounded-full grid place-content-center border border-[var(--amber)] bg-batik">
-                    <svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><use href="#wayangHead"></use></svg>
-                </div>
+        <header class="flex items-center gap-2 py-2">
+            <div class="w-8 h-8 shrink-0 rounded-full grid place-content-center border border-[var(--amber)] bg-batik">
+                <svg viewBox="0 0 40 40" width="20" height="20" aria-hidden="true"><use href="#wayangHead"></use></svg>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex-1 min-w-0 grid grid-cols-2 gap-1.5">
+                <button type="button" id="menuKalkulator" class="px-2 py-2 rounded-lg text-xs font-semibold btn-coklat truncate">🧮 Kalkulator Weton</button>
+                <button type="button" id="menuKalender" class="px-2 py-2 rounded-lg text-xs font-semibold btn-out truncate">📆 Kalender Jawa</button>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
                 <!-- Tombol refresh (ikon) -->
-                <button id="btnRefresh" class="icon-btn" aria-label="Muat ulang">
+                <button id="btnRefresh" class="icon-btn" style="width:36px;height:36px" aria-label="Muat ulang">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M17.65 6.35A7.95 7.95 0 0012 4a8 8 0 108 8h-2a6 6 0 11-6-6c1.66 0 3.14.67 4.22 1.76L13 11h7V4l-2.35 2.35z"/>
                     </svg>
                 </button>
                 <!-- Toggle tema -->
-                <button id="toggleTema" class="icon-btn" aria-label="Ganti tema">
+                <button id="toggleTema" class="icon-btn" style="width:36px;height:36px" aria-label="Ganti tema">
                     <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-[var(--coklat-900)] dark:hidden">
                         <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
                     </svg>
@@ -964,8 +960,8 @@
             const kalk = view === 'kalkulator';
             document.getElementById('viewKalkulator').classList.toggle('hidden', !kalk);
             document.getElementById('viewKalender').classList.toggle('hidden', kalk);
-            document.getElementById('menuKalkulator').className = 'px-4 py-2 rounded-lg text-sm font-semibold ' + (kalk ? 'btn-coklat' : 'btn-out');
-            document.getElementById('menuKalender').className = 'px-4 py-2 rounded-lg text-sm font-semibold ' + (kalk ? 'btn-out' : 'btn-coklat');
+            document.getElementById('menuKalkulator').className = 'px-2 py-2 rounded-lg text-xs font-semibold truncate ' + (kalk ? 'btn-coklat' : 'btn-out');
+            document.getElementById('menuKalender').className = 'px-2 py-2 rounded-lg text-xs font-semibold truncate ' + (kalk ? 'btn-out' : 'btn-coklat');
             if (!kalk) kalRender();
             window.scrollTo(0,0);
         }
