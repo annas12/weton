@@ -136,15 +136,21 @@
             </div>
         </header>
 
+        <!-- MODE -->
+        <div class="mt-3 flex justify-center gap-2">
+            <button type="button" id="modePasangan" class="px-5 py-2 rounded-full text-sm font-semibold btn-coklat">💑 Pasangan</button>
+            <button type="button" id="modeSingle" class="px-5 py-2 rounded-full text-sm font-semibold btn-out">👤 Satu Orang</button>
+        </div>
+
         <!-- FORM -->
         <form id="wetonForm" class="mt-3 grid md:grid-cols-2 gap-4 sm:gap-6">
             <div class="space-y-3">
-                <label class="block text-sm font-semibold" for="namaPria">Nama Pria</label>
+                <label id="labelNamaPria" class="block text-sm font-semibold" for="namaPria">Nama Pria</label>
                 <input id="namaPria" type="text" class="w-full p-3 rounded-lg border bg-white/80" placeholder="Masukkan nama pria" required>
-                <label class="block text-sm font-semibold" for="tglPria">Tanggal Lahir Pria</label>
+                <label id="labelTglPria" class="block text-sm font-semibold" for="tglPria">Tanggal Lahir Pria</label>
                 <input id="tglPria" type="date" class="w-full p-3 rounded-lg border bg-white/80" required>
             </div>
-            <div class="space-y-3">
+            <div id="kolomWanita" class="space-y-3">
                 <label class="block text-sm font-semibold" for="namaWanita">Nama Wanita</label>
                 <input id="namaWanita" type="text" class="w-full p-3 rounded-lg border bg-white/80" placeholder="Masukkan nama wanita" required>
                 <label class="block text-sm font-semibold" for="tglWanita">Tanggal Lahir Wanita</label>
@@ -175,10 +181,10 @@
 
                     <div class="relative z-10 grid md:grid-cols-2 gap-6">
                         <div>
-                            <h3 class="font-bold text-lg" style="color:var(--coklat-900)">👤 Data Pria</h3>
+                            <h3 id="judulDataPria" class="font-bold text-lg" style="color:var(--coklat-900)">👤 Data Pria</h3>
                             <div id="dataPria" class="text-sm md:text-base mt-1 space-y-1"></div>
                         </div>
-                        <div>
+                        <div id="kolomDataWanita">
                             <h3 class="font-bold text-lg" style="color:var(--coklat-900)">👩 Data Wanita</h3>
                             <div id="dataWanita" class="text-sm md:text-base mt-1 space-y-1"></div>
                         </div>
@@ -186,6 +192,7 @@
 
                     <hr class="my-5 border-[var(--amber)]/60 relative z-10" />
 
+                    <div id="bagianJodoh">
                     <div class="relative z-10">
                         <h3 class="font-bold text-lg" style="color:var(--coklat-900)">💑 Kecocokan Jodoh</h3>
                         <div id="kecocokan" class="mt-2 text-sm md:text-base leading-relaxed"></div>
@@ -199,6 +206,12 @@
                     <div class="mt-6 relative z-10">
                         <h3 class="font-bold text-lg" style="color:var(--coklat-900)">📅 Saran Hari / Pasaran Nikah</h3>
                         <ul id="saranHari" class="mt-2 list-disc list-inside text-sm md:text-base leading-relaxed space-y-1"></ul>
+                    </div>
+                    </div>
+
+                    <div id="bagianPribadi" class="mt-6 relative z-10 hidden">
+                        <h3 class="font-bold text-lg" style="color:var(--coklat-900)">📅 Saran Hari Baik Pribadi</h3>
+                        <ul id="saranPribadi" class="mt-2 list-disc list-inside text-sm md:text-base leading-relaxed space-y-1"></ul>
                     </div>
                 </div>
             </div>
@@ -252,7 +265,7 @@
 
         /* ===== Kategori hasil jodoh ===== */
         const KATEGORI = [
-            {keys:[7,14,21,28,35], name:"🟥 Pegat (Pisah/Cerai)", html:`<p><strong>Makna:</strong> Pegat berarti “pisah”. Menunjukkan potensi besar pertengkaran, krisis rumah tangga, hingga perceraian.</p>
+            {keys:[1,9,10,18,19,27,28,36], name:"🟥 Pegat (Pisah/Cerai)", html:`<p><strong>Makna:</strong> Pegat berarti “pisah”. Menunjukkan potensi besar pertengkaran, krisis rumah tangga, hingga perceraian.</p>
             <p class='mt-2'><strong>Penyebab spesifik:</strong></p>
             <ul class='list-disc list-inside'>
             <li>Perbedaan prinsip hidup mencolok.</li>
@@ -263,7 +276,7 @@
             <li>Rezeki rumah tangga cenderung seret.</li>
             </ul>
             <p class='mt-2'><strong>Solusi tradisional:</strong> Ruwatan/tolak bala (siraman, tumpengan weton), memperkuat komunikasi dan spiritualitas bersama.</p>`},
-            {keys:[8,15,22,29], name:"🟩 Ratu (Raja & Ratu)", html:`<p><strong>Makna:</strong> Pasangan seperti raja dan ratu; sangat serasi lahir batin.</p>
+            {keys:[2,11,20,29], name:"🟩 Ratu (Raja & Ratu)", html:`<p><strong>Makna:</strong> Pasangan seperti raja dan ratu; sangat serasi lahir batin.</p>
             <ul class='list-disc list-inside mt-2'>
             <li>Energi spiritual sangat harmonis.</li>
             <li>Saling menguatkan dan memahami secara alami.</li>
@@ -271,7 +284,7 @@
             <li>Sering dianggap pasangan idaman.</li>
             </ul>
             <p class='mt-2'><strong>Catatan:</strong> Tetap rendah hati agar tidak muncul ketimpangan peran.</p>`},
-            {keys:[9,16,23,30], name:"🟨 Jodoh", html:`<p><strong>Makna:</strong> Jodoh alamiah, berjodoh secara spiritual maupun nasib.</p>
+            {keys:[3,12,21,30], name:"🟨 Jodoh", html:`<p><strong>Makna:</strong> Jodoh alamiah, berjodoh secara spiritual maupun nasib.</p>
             <ul class='list-disc list-inside mt-2'>
             <li>Komunikasi nyambung.</li>
             <li>Karakter saling menutupi kekurangan.</li>
@@ -279,40 +292,67 @@
             <li>Sering dipertemukan oleh “takdir”.</li>
             </ul>
             <p class='mt-2'><strong>Tantangan:</strong> Hambatan eksternal (ekonomi/status) bisa muncul; bukan masalah batin.</p>`},
-            {keys:[10,17,24,31], name:"🟪 Topo (Bertapa/Ujian Hidup)", html:`<p><strong>Makna:</strong> Rumah tangga penuh ujian; seperti sedang “bertapa”.</p>
+            {keys:[4,13,22,31], name:"🟪 Topo (Bertapa/Ujian Hidup)", html:`<p><strong>Makna:</strong> Rumah tangga penuh ujian; seperti sedang “bertapa”.</p>
             <ul class='list-disc list-inside mt-2'>
             <li>Ujian ekonomi, kesehatan, jarak, atau godaan luar.</li>
             <li>Kalau tidak saling dukung, bisa saling menjatuhkan.</li>
             <li>Anak sulit diatur bila orang tua tidak kompak.</li>
             </ul>
             <p class='mt-2'><strong>Filosofi:</strong> Mampu melewati ujian → naik derajat spiritual & rezeki terbuka.</p>`},
-            {keys:[11,18,25,32], name:"🟦 Tinari (Untung/Beruntung)", html:`<p><strong>Makna:</strong> Pasangan yang sering mendapat keberuntungan.</p>
+            {keys:[5,14,23,32], name:"🟦 Tinari (Untung/Beruntung)", html:`<p><strong>Makna:</strong> Pasangan yang sering mendapat keberuntungan.</p>
             <ul class='list-disc list-inside mt-2'>
             <li>Urusan lancar, rezeki relatif mudah.</li>
             <li>Jarang sakit-sakitan; anak membawa hoki.</li>
             </ul>
             <p class='mt-2'><strong>Catatan:</strong> Jangan terlena; tetap jaga pondasi spiritual & komunikasi.</p>`},
-            {keys:[12,19,26,33], name:"🟧 Padu (Bertengkar tapi tetap)", html:`<p><strong>Makna:</strong> Sering terjadi konflik kecil, tetapi tetap bersama.</p>
+            {keys:[6,15,24,33], name:"🟧 Padu (Bertengkar tapi tetap)", html:`<p><strong>Makna:</strong> Sering terjadi konflik kecil, tetapi tetap bersama.</p>
             <ul class='list-disc list-inside mt-2'>
             <li>Beda prinsip & ego tinggi → adu argumen.</li>
             <li>Ikatan batin kuat; sulit berpisah.</li>
             </ul>
             <p class='mt-2'><strong>Saran:</strong> Latih sabar, komunikasi terbuka, dan manajemen emosi.</p>`},
-            {keys:[13,20,27,34], name:"🟥 Sujanan (Selingkuh/Dikhianati)", html:`<p><strong>Makna:</strong> Ada potensi pengkhianatan/orang ketiga.</p>
+            {keys:[7,16,25,34], name:"🟥 Sujanan (Selingkuh/Dikhianati)", html:`<p><strong>Makna:</strong> Ada potensi pengkhianatan/orang ketiga.</p>
             <ul class='list-disc list-inside mt-2'>
             <li>Ketidakpuasan emosional/kurang dihargai.</li>
             <li>Energi batin tidak sinkron → mudah curiga/posesif.</li>
             </ul>
-            <p class='mt-2'><strong>Solusi:</strong> Kejujuran, terapi komunikasi, dan ruwatan weton bersama.</p>`}
+            <p class='mt-2'><strong>Solusi:</strong> Kejujuran, terapi komunikasi, dan ruwatan weton bersama.</p>`},
+            {keys:[8,17,26,35], name:"🟢 Pesthi (Rukun & Tenteram)", html:`<p><strong>Makna:</strong> Rumah tangga rukun, damai, dan tenteram — sering disebut jodoh yang langgeng sampai tua.</p>
+            <ul class='list-disc list-inside mt-2'>
+            <li>Perbedaan bisa diselesaikan sendiri tanpa campur tangan luar.</li>
+            <li>Suasana rumah tenang dan stabil.</li>
+            <li>Kerikil kecil cepat teratasi dan tidak merusak keharmonisan.</li>
+            </ul>
+            <p class='mt-2'><strong>Catatan:</strong> Jangan terlena; tetap ciptakan kehangatan dan kegiatan baru bersama agar hubungan tidak terasa hambar.</p>`}
         ];
 
-        /* ===== Kombinasi spesifik contoh ===== */
+        /* ===== Kombinasi spesifik (25 pasangan pasaran: pria-wanita) ===== */
         const KOMBO_SPESIFIK = {
-            "Wage-Pahing":"Pribadi analitis & pendiam (Wage) bertemu energi kepemimpinan & ambisi (Pahing). Kuat di strategi; perlu melunak saat menyampaikan pendapat.",
-            "Pahing-Wage":"Sosok dominan & visioner (Pahing) berpadu pasangan reflektif (Wage). Cocok untuk rencana jangka panjang; hindari mengatur berlebihan.",
+            "Legi-Legi":"Dua pribadi penyayang & pendamai (Legi) bertemu. Rumah tangga hangat dan jarang ribut; waspadai sikap terlalu mengalah hingga keputusan penting tertunda.",
+            "Legi-Pahing":"Kelembutan & harmoni (Legi) bertemu ambisi & kepemimpinan (Pahing). Pahing memberi arah, Legi menjaga suasana; seimbangkan agar yang satu tidak merasa diatur.",
+            "Legi-Pon":"Penyayang & pendamai (Legi) berpadu pasangan stabil & rasional (Pon). Nyaman dan tertata; biasakan menyampaikan keinginan secara langsung.",
+            "Legi-Wage":"Kelembutan (Legi) bertemu pribadi reflektif & sensitif (Wage). Saling memahami tanpa banyak kata; jangan biarkan perasaan dipendam terlalu lama.",
             "Legi-Kliwon":"Kelembutan & harmoni (Legi) dipadu intuisi kuat (Kliwon). Hangat & religius.",
+            "Pahing-Legi":"Ambisi & daya juang (Pahing) dipadu kelembutan (Legi). Kuat mengejar target dengan suasana rumah yang teduh; luangkan waktu untuk hal-hal kecil yang menyenangkan.",
+            "Pahing-Pahing":"Dua pribadi ambisius & dominan (Pahing) bertemu. Daya dorong besar dan cepat maju; tentukan siapa memimpin di bidang apa agar tidak saling berebut kendali.",
+            "Pahing-Pon":"Kepemimpinan & ambisi (Pahing) berpadu kestabilan & keteraturan (Pon). Rencana besar berjalan rapi; beri ruang bagi Pon untuk menata langkah.",
+            "Pahing-Wage":"Sosok dominan & visioner (Pahing) berpadu pasangan reflektif (Wage). Cocok untuk rencana jangka panjang; hindari mengatur berlebihan.",
+            "Pahing-Kliwon":"Ambisi tinggi (Pahing) bertemu intuisi tajam (Kliwon). Keputusan berani yang disertai firasat kuat; seimbangkan target duniawi dengan ketenangan batin.",
+            "Pon-Legi":"Stabil & rasional (Pon) bertemu penyayang & pendamai (Legi). Teratur tapi tetap hangat; sisihkan waktu khusus berdua di luar rutinitas.",
+            "Pon-Pahing":"Keteraturan & rasional (Pon) berpadu ambisi & kepemimpinan (Pahing). Pondasi kokoh untuk rencana jangka panjang; jangan takut mengubah rencana bila keadaan berubah.",
+            "Pon-Pon":"Dua pribadi stabil & rasional (Pon) bertemu. Rumah tangga tertib dan minim drama; tambahkan kejutan kecil agar tidak terasa monoton.",
             "Pon-Wage":"Rasional & teratur (Pon) bertemu pendiam yang sensitif (Wage). Stabil, tapi rawan miskom jika perasaan dipendam.",
-            "Kliwon-Pahing":"Intuisi kuat (Kliwon) + ambisi tinggi (Pahing). Daya dorong besar; seimbangkan batin & target duniawi."
+            "Pon-Kliwon":"Rasional & teratur (Pon) bertemu intuisi & spiritual (Kliwon). Logika dan firasat saling melengkapi; dengarkan kata hati saat data sudah mentok.",
+            "Wage-Legi":"Reflektif & sensitif (Wage) bertemu penyayang & pendamai (Legi). Saling menjaga perasaan dengan lembut; latih keterbukaan agar tidak salah sangka.",
+            "Wage-Pahing":"Pribadi analitis & pendiam (Wage) bertemu energi kepemimpinan & ambisi (Pahing). Kuat di strategi; perlu melunak saat menyampaikan pendapat.",
+            "Wage-Pon":"Pendiam yang sensitif (Wage) berpadu stabil & rasional (Pon). Tenang dan bisa diandalkan; sampaikan kebutuhan dengan jelas, jangan berharap pasangan menebak.",
+            "Wage-Wage":"Dua pribadi reflektif & pendiam (Wage) bertemu. Saling memahami dalam diam; jadwalkan obrolan rutin agar hal penting tidak terlewat.",
+            "Wage-Kliwon":"Kepekaan batin (Wage) bertemu intuisi tajam (Kliwon). Sangat peka satu sama lain; jaga batas agar tidak saling menyerap emosi negatif.",
+            "Kliwon-Legi":"Intuisi kuat & spiritual (Kliwon) dipadu kelembutan (Legi). Hangat & religius; cocok membangun kebiasaan ibadah dan ketenangan bersama.",
+            "Kliwon-Pahing":"Intuisi kuat (Kliwon) + ambisi tinggi (Pahing). Daya dorong besar; seimbangkan batin & target duniawi.",
+            "Kliwon-Pon":"Intuisi & empati (Kliwon) bertemu stabil & rasional (Pon). Firasat yang ditopang logika; bagus untuk keputusan besar seperti rumah dan usaha.",
+            "Kliwon-Wage":"Spiritual & berempati (Kliwon) berpadu reflektif & sensitif (Wage). Ikatan batin dalam; saling dukung saat salah satu sedang lelah secara emosi.",
+            "Kliwon-Kliwon":"Dua pribadi berintuisi tajam & spiritual (Kliwon) bertemu. Sangat nyambung secara batin; tetap berpijak pada hal nyata agar tidak hanyut dalam perasaan."
         };
 
         /* ===== Perhitungan (UTC-safe) ===== */
@@ -358,7 +398,7 @@
             const out = [];
             const push = (h, alasan)=>out.push(`<li><strong>${h}</strong> — ${alasan}</li>`);
 
-            if (katName.includes("Ratu") || katName.includes("Jodoh") || katName.includes("Tinari")){
+            if (katName.includes("Ratu") || katName.includes("Jodoh") || katName.includes("Tinari") || katName.includes("Pesthi")){
                 push("Jumat Legi", "Simbol harmoni & rezeki; cocok untuk pasangan yang selaras.");
                 push("Rabu Pahing", "Menjernihkan batin & memantapkan niat bersama.");
             }
@@ -373,6 +413,32 @@
             if (!out.length) push("Jumat Legi", "Hari populer untuk awal rumah tangga yang damai dan berkah.");
             return out;
         }
+        function saranHariPribadi(w){
+            const out = [];
+            const push = (h, alasan)=>out.push(`<li><strong>${h}</strong> — ${alasan}</li>`);
+            push(`Jumat ${w.pasaran}`, 'Pasaran kelahiranmu sendiri — hari yang selaras dengan energimu, baik untuk memulai hal penting.');
+            const pasanganHari = {Legi:'Senin Legi', Pahing:'Rabu Pahing', Pon:'Kamis Pon', Wage:'Selasa Wage', Kliwon:'Jumat Kliwon'}[w.pasaran];
+            push(pasanganHari, 'Kombinasi hari & pasaran yang seirama dengan wetonmu.');
+            push('Jumat Legi', 'Hari yang populer untuk memulai usaha, hajatan, atau keputusan besar.');
+            return out;
+        }
+
+        /* ===== Mode hitung ===== */
+        let modeHitung = 'pasangan';
+        function setMode(mode){
+            modeHitung = mode;
+            const pasangan = mode === 'pasangan';
+            document.getElementById('modePasangan').className = 'px-5 py-2 rounded-full text-sm font-semibold ' + (pasangan ? 'btn-coklat' : 'btn-out');
+            document.getElementById('modeSingle').className = 'px-5 py-2 rounded-full text-sm font-semibold ' + (pasangan ? 'btn-out' : 'btn-coklat');
+            document.getElementById('kolomWanita').classList.toggle('hidden', !pasangan);
+            document.getElementById('namaWanita').required = pasangan;
+            document.getElementById('tglWanita').required = pasangan;
+            document.getElementById('labelNamaPria').textContent = pasangan ? 'Nama Pria' : 'Nama';
+            document.getElementById('labelTglPria').textContent = pasangan ? 'Tanggal Lahir Pria' : 'Tanggal Lahir';
+            document.getElementById('hasil').classList.add('hidden');
+        }
+        document.getElementById('modePasangan').addEventListener('click', ()=>setMode('pasangan'));
+        document.getElementById('modeSingle').addEventListener('click', ()=>setMode('single'));
 
         /* ===== Helper ===== */
         const $ = s=>document.querySelector(s);
@@ -380,34 +446,53 @@
             $('#wetonForm').reset(); $('#hasil').classList.add('hidden'); unityBridge('showAd');
             $('#dataPria').innerHTML = ''; $('#dataWanita').innerHTML = '';
             $('#kecocokan').innerHTML = ''; $('#analisaKombinasi').innerHTML = '';
-            $('#saranHari').innerHTML = ''; $('#shareHint').textContent = '';
+            $('#saranHari').innerHTML = ''; $('#saranPribadi').innerHTML = ''; $('#shareHint').textContent = '';
         });
 
         /* ===== SUBMIT: render hasil ===== */
         document.getElementById('wetonForm').addEventListener('submit', (e)=>{
             e.preventDefault();
 
+            const single = modeHitung === 'single';
             const namaPria = $('#namaPria').value.trim();
-            const namaWanita = $('#namaWanita').value.trim();
+            const namaWanita = single ? '' : $('#namaWanita').value.trim();
             const tPria = $('#tglPria').value;
-            const tWanita = $('#tglWanita').value;
+            const tWanita = single ? '' : $('#tglWanita').value;
 
-            if (!namaPria || !namaWanita || !tPria || !tWanita){
+            if (!namaPria || !tPria || (!single && (!namaWanita || !tWanita))){
                 alert('Lengkapi semua data.');
                 return;
             }
 
             // Hitung & render
             const pria = hitungWetonFromInput(tPria);
-            const wanita = hitungWetonFromInput(tWanita);
-            const total = pria.neptu + wanita.neptu;
-            const kat = kategoriDariTotal(total);
+            $('#judulDataPria').textContent = single ? '👤 Data Diri' : '👤 Data Pria';
+            $('#kolomDataWanita').classList.toggle('hidden', single);
 
             $('#dataPria').innerHTML = `
                 <div><strong>Nama:</strong> ${namaPria}</div>
                 <div><strong>Weton:</strong> ${pria.hari} ${pria.pasaran}</div>
                 <div><strong>Neptu:</strong> ${pria.neptu}</div>
                 <div class="mt-1">${karakterLengkap(pria)}</div>`;
+
+            if (single){
+                const saranSingle = saranHariPribadi(pria);
+                $('#saranPribadi').innerHTML = saranSingle.join('');
+                $('#bagianJodoh').classList.add('hidden');
+                $('#bagianPribadi').classList.remove('hidden');
+                $('#hasil').classList.remove('hidden');
+                $('#shareHint').textContent = '';
+                window._ringkasanText =
+                    `Kalkulator Weton\n\n`+
+                    `${namaPria} (${pria.hari} ${pria.pasaran}, neptu ${pria.neptu})\n`+
+                    `Saran Hari Baik: ` + saranSingle.map(li => li.replace(/<[^>]+>/g,'')).join(' | ');
+                // 🔸 Tampilkan iklan interstitial setelah klik Proses
+                unityBridge('showAd');
+                return;
+            }
+            const wanita = hitungWetonFromInput(tWanita);
+            const total = pria.neptu + wanita.neptu;
+            const kat = kategoriDariTotal(total);
 
             $('#dataWanita').innerHTML = `
                 <div><strong>Nama:</strong> ${namaWanita}</div>
@@ -428,6 +513,8 @@
             const saran = buatSaranHari(pria, wanita, total);
             $('#saranHari').innerHTML = saran.join('');
 
+            $('#bagianJodoh').classList.remove('hidden');
+            $('#bagianPribadi').classList.add('hidden');
             $('#hasil').classList.remove('hidden');
             $('#shareHint').textContent = '';
 
