@@ -142,6 +142,13 @@
             <button type="button" id="modeSingle" class="px-5 py-2 rounded-full text-sm font-semibold btn-out">👤 Satu Orang</button>
         </div>
 
+        <!-- WETON HARI INI -->
+        <div class="mt-3 kartu-batik p-4 text-center relative z-10">
+            <div class="text-xs opacity-70">Weton Hari Ini</div>
+            <div id="wetonHariIniIsi" class="font-bold text-lg" style="color:var(--coklat-900)">…</div>
+            <div id="wetonHariIniTgl" class="text-xs opacity-70"></div>
+        </div>
+
         <!-- FORM -->
         <form id="wetonForm" class="mt-3 grid md:grid-cols-2 gap-4 sm:gap-6">
             <div class="space-y-3">
@@ -149,18 +156,29 @@
                 <input id="namaPria" type="text" class="w-full p-3 rounded-lg border bg-white/80" placeholder="Masukkan nama pria" required>
                 <label id="labelTglPria" class="block text-sm font-semibold" for="tglPria">Tanggal Lahir Pria</label>
                 <input id="tglPria" type="date" class="w-full p-3 rounded-lg border bg-white/80" required>
+                <label class="flex items-start gap-2 text-xs font-normal opacity-80"><input id="magribPria" type="checkbox" class="mt-0.5 accent-[#6a4226]"> Lahir setelah Magrib (18.00) — hari Jawa sudah berganti</label>
             </div>
             <div id="kolomWanita" class="space-y-3">
                 <label class="block text-sm font-semibold" for="namaWanita">Nama Wanita</label>
                 <input id="namaWanita" type="text" class="w-full p-3 rounded-lg border bg-white/80" placeholder="Masukkan nama wanita" required>
                 <label class="block text-sm font-semibold" for="tglWanita">Tanggal Lahir Wanita</label>
                 <input id="tglWanita" type="date" class="w-full p-3 rounded-lg border bg-white/80" required>
+                <label class="flex items-start gap-2 text-xs font-normal opacity-80"><input id="magribWanita" type="checkbox" class="mt-0.5 accent-[#6a4226]"> Lahir setelah Magrib (18.00) — hari Jawa sudah berganti</label>
             </div>
             <div class="md:col-span-2 flex flex-wrap gap-3 justify-center">
                 <button type="submit" class="px-6 py-2 rounded-lg text-white font-semibold btn-coklat">Proses</button>
                 <button type="button" id="btnReset" class="px-6 py-2 rounded-lg font-semibold btn-out">Reset</button>
             </div>
         </form>
+
+        <!-- RIWAYAT -->
+        <section id="riwayatWrap" class="mt-5 hidden">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base" style="color:var(--coklat-900)">🕘 Riwayat Perhitungan</h3>
+                <button id="btnHapusRiwayat" type="button" class="text-xs font-semibold btn-out px-3 py-1 rounded-full">Hapus riwayat</button>
+            </div>
+            <div id="riwayatList" class="mt-2 space-y-2"></div>
+        </section>
 
         <!-- HASIL -->
         <section id="hasil" class="mt-5 hidden">
@@ -207,12 +225,21 @@
                         <h3 class="font-bold text-lg" style="color:var(--coklat-900)">📅 Saran Hari / Pasaran Nikah</h3>
                         <ul id="saranHari" class="mt-2 list-disc list-inside text-sm md:text-base leading-relaxed space-y-1"></ul>
                     </div>
+
+                    <div class="mt-6 relative z-10">
+                        <h3 class="font-bold text-lg" style="color:var(--coklat-900)">🏠 Saran Hari Baik Lainnya</h3>
+                        <ul id="saranAktivitas" class="mt-2 list-disc list-inside text-sm md:text-base leading-relaxed space-y-1"></ul>
+                    </div>
                     </div>
 
                     <div id="bagianPribadi" class="mt-6 relative z-10 hidden">
                         <h3 class="font-bold text-lg" style="color:var(--coklat-900)">📅 Saran Hari Baik Pribadi</h3>
                         <ul id="saranPribadi" class="mt-2 list-disc list-inside text-sm md:text-base leading-relaxed space-y-1"></ul>
+                        <h3 class="font-bold text-lg mt-6" style="color:var(--coklat-900)">🏠 Saran Hari Baik Lainnya</h3>
+                        <ul id="saranAktivitasPribadi" class="mt-2 list-disc list-inside text-sm md:text-base leading-relaxed space-y-1"></ul>
                     </div>
+
+                    <p class="mt-6 pt-4 border-t border-[var(--amber)]/40 relative z-10 text-xs opacity-70">Catatan: Hasil ini adalah tafsir budaya Jawa (primbon) — jadikan sebagai bahan pertimbangan, bukan kepastian mutlak.</p>
                 </div>
             </div>
 
@@ -221,6 +248,15 @@
                 <button id="btnShare" class="px-5 py-2 rounded-lg text-white font-semibold" style="background:linear-gradient(90deg,#4e342e,#6b4226)">Bagikan</button>
                 <button id="btnWA" class="px-5 py-2 rounded-lg text-white font-semibold" style="background:#2ea043">Bagikan ke WhatsApp</button>
                 <button id="btnCopy" class="px-5 py-2 rounded-lg font-semibold btn-out">Salin Ringkasan</button>
+                <button id="btnGambar" class="px-5 py-2 rounded-lg text-white font-semibold" style="background:#7b5e3a">Bagikan sebagai Gambar</button>
+            </div>
+            <div id="ratingPrompt" class="hidden mt-3 p-4 rounded-lg border bg-white/80 text-sm">
+                <div class="font-semibold">⭐ Suka dengan hasilnya?</div>
+                <p class="opacity-80 mt-1">Bantu kami dengan memberi rating di Play Store — ulasan Anda membantu aplikasi ini ditemukan lebih banyak orang.</p>
+                <div class="mt-3 flex gap-2">
+                    <a id="btnRatingBeri" href="https://play.google.com/store/apps/details?id=com.weton.app" target="_blank" rel="noopener" class="px-4 py-2 rounded-lg text-white font-semibold" style="background:var(--coklat-700)">Beri Rating ★</a>
+                    <button id="btnRatingNanti" type="button" class="px-4 py-2 rounded-lg font-semibold btn-out">Nanti saja</button>
+                </div>
             </div>
             <p id="shareHint" class="mt-2 text-xs opacity-70"></p>
         </section>
@@ -372,17 +408,106 @@
             const hari = HARI[dt.getUTCDay()];
             const pasaran = getPasaranUTC(y, m, d);
             const neptu = NEPTU_HARI[hari] + NEPTU_PASARAN[pasaran];
-            return { hari, pasaran, neptu };
+            return { hari, pasaran, neptu, wuku: hitungWuku(y, m, d), pancasuda: pancasudaDariWeton(hari, pasaran), pekerjaan: pekerjaanDariNeptu(neptu) };
         }
-        function hitungWetonFromInput(dateStr){
+        function hitungWetonFromInput(dateStr, setelahMagrib){
             const [yy, mm, dd] = dateStr.split("-").map(Number);
-            return hitungWetonAkurat(yy, mm, dd);
+            let t = Date.UTC(yy, mm-1, dd);
+            if (setelahMagrib) t += 86400000; // lahir setelah Magrib: hari Jawa sudah berganti
+            const d2 = new Date(t);
+            return hitungWetonAkurat(d2.getUTCFullYear(), d2.getUTCMonth()+1, d2.getUTCDate());
+        }
+
+        /* ===== Wuku (siklus pawukon 210 hari; jangkar 21 Mei 2000 = Sinta, sumber: ngetools.id & petungan.id) ===== */
+        const WUKU = [
+            {nama:"Sinta", karakter:"Lemah lembut, penyayang, artistik"},
+            {nama:"Landep", karakter:"Tajam pikiran, strategis, kritis"},
+            {nama:"Wukir", karakter:"Tangguh, keras kepala, berani"},
+            {nama:"Kurantil", karakter:"Sabar, teliti, suka menolong"},
+            {nama:"Tolu", karakter:"Mandiri, ulet, teguh pendirian"},
+            {nama:"Gumbreg", karakter:"Murah hati, sosial, diplomatik"},
+            {nama:"Wariga", karakter:"Berhati-hati, penuh pertimbangan"},
+            {nama:"Warigadean", karakter:"Setia, penuh dedikasi"},
+            {nama:"Julungwangi", karakter:"Karismatik, menarik, berwibawa"},
+            {nama:"Sungsang", karakter:"Kompleks, penuh kontradiksi"},
+            {nama:"Galungan", karakter:"Kuat spiritual, bijaksana"},
+            {nama:"Kuningan", karakter:"Mulia, jujur, disegani"},
+            {nama:"Langkir", karakter:"Tegas, berani, ksatria"},
+            {nama:"Mandasiya", karakter:"Kreatif, inovatif, penuh ide"},
+            {nama:"Julungpujut", karakter:"Santun, rendah hati"},
+            {nama:"Pahang", karakter:"Tekun, pekerja keras"},
+            {nama:"Kuruwelut", karakter:"Dinamis, aktif, penuh energi"},
+            {nama:"Marakeh", karakter:"Stabil, konsisten, dapat diandalkan"},
+            {nama:"Tambir", karakter:"Fleksibel, adaptif"},
+            {nama:"Medangkungan", karakter:"Wibawa tinggi, pemimpin alami"},
+            {nama:"Matal", karakter:"Empati tinggi, perasa"},
+            {nama:"Uye", karakter:"Sederhana, apa adanya, tulus"},
+            {nama:"Manail", karakter:"Komunikatif, pandai bergaul"},
+            {nama:"Prangbakat", karakter:"Berani, pionir, pejuang"},
+            {nama:"Bala", karakter:"Kuat fisik, tahan banting"},
+            {nama:"Wugu", karakter:"Tenang, bijak, filosofis"},
+            {nama:"Wayang", karakter:"Penuh seni dan ekspresi"},
+            {nama:"Klawu", karakter:"Sensitif, intuitif"},
+            {nama:"Dukut", karakter:"Mandiri, otonom"},
+            {nama:"Watugunung", karakter:"Keras, ambisius, kuat karakter"}
+        ];
+        const WUKU_ANCHOR_UTC = Date.UTC(2000, 4, 21); // 21 Mei 2000 (Minggu) = awal Wuku Sinta
+        function hitungWuku(y,m,d){
+            const diff = Math.floor((Date.UTC(y, m-1, d) - WUKU_ANCHOR_UTC)/86400000);
+            const idx = mod(Math.floor(mod(diff, 210)/7), 30);
+            return {nama: WUKU[idx].nama, karakter: WUKU[idx].karakter, hariKe: mod(diff, 7)+1};
+        }
+
+        /* ===== Pancasuda (per weton, sumber: tabloidelemen.com) ===== */
+        const PANCASUDA_MAKNA = {
+            "Wasesa Segara":"Pemurah, pemaaf, berwibawa, dan bertanggung jawab.",
+            "Tunggak Semi":"Penghasilannya selalu terjamin, rezeki selalu ada.",
+            "Satriya Wibawa":"Dihormati orang karena kemuliaan dan keluhurannya.",
+            "Sumur Sinaba":"Dicari orang karena petuah dan nasihatnya, serta banyak pengetahuannya.",
+            "Bumi Kapetak":"Suka bekerja, kuat menahan kecewa dan penderitaan, rapi dan bersih hidupnya.",
+            "Satriya Wirang":"Luhur budinya tetapi sering dipermalukan orang.",
+            "Lebu Katiyup Angin":"Serba kekurangan, jauh dari keberuntungan, sulit mendapat kemajuan dalam pekerjaan dan usaha."
+        };
+        const PANCASUDA = {
+            "Minggu Legi":"Sumur Sinaba","Minggu Pahing":"Wasesa Segara","Minggu Pon":"Bumi Kapetak","Minggu Wage":"Satriya Wibawa","Minggu Kliwon":"Lebu Katiyup Angin",
+            "Senin Legi":"Tunggak Semi","Senin Pahing":"Bumi Kapetak","Senin Pon":"Sumur Sinaba","Senin Wage":"Lebu Katiyup Angin","Senin Kliwon":"Satriya Wirang",
+            "Selasa Legi":"Wasesa Segara","Selasa Pahing":"Satriya Wirang","Selasa Pon":"Satriya Wibawa","Selasa Wage":"Wasesa Segara","Selasa Kliwon":"Sumur Sinaba",
+            "Rabu Legi":"Sumur Sinaba","Rabu Pahing":"Wasesa Segara","Rabu Pon":"Bumi Kapetak","Rabu Wage":"Wasesa Segara","Rabu Kliwon":"Lebu Katiyup Angin",
+            "Kamis Legi":"Satriya Wibawa","Kamis Pahing":"Lebu Katiyup Angin","Kamis Pon":"Satriya Wirang","Kamis Wage":"Tunggak Semi","Kamis Kliwon":"Bumi Kapetak",
+            "Jumat Legi":"Satriya Wirang","Jumat Pahing":"Tunggak Semi","Jumat Pon":"Lebu Katiyup Angin","Jumat Wage":"Sumur Sinaba","Jumat Kliwon":"Wasesa Segara",
+            "Sabtu Legi":"Bumi Kapetak","Sabtu Pahing":"Satriya Wibawa","Sabtu Pon":"Wasesa Segara","Sabtu Wage":"Satriya Wirang","Sabtu Kliwon":"Tunggak Semi"
+        };
+        function pancasudaDariWeton(hari, pasaran){
+            const nama = PANCASUDA[hari + ' ' + pasaran] || '(Tidak Diketahui)';
+            return {nama, makna: PANCASUDA_MAKNA[nama] || ''};
+        }
+
+        /* ===== Pekerjaan cocok (neptu dibagi 8, sumber: primbon Jawa via kapanlagi.com) ===== */
+        const PEKERJAAN_LAMBANG = {
+            1:{lambang:"Mata", daftar:"tukang kayu, pedagang, desainer, arsitek, model, artis"},
+            2:{lambang:"Irung", daftar:"guru, peternak, pengusaha daging, tukang batu / mandor bangunan"},
+            3:{lambang:"Cangkem", daftar:"pedagang"},
+            4:{lambang:"Kuping", daftar:"penjahit, pedagang, pemimpin, PNS, peneliti"},
+            5:{lambang:"Tangan", daftar:"petani, seniman, pedagang"},
+            6:{lambang:"Dubur", daftar:"dokter, tukang kayu, pedagang, karyawan"},
+            7:{lambang:"Sikil", daftar:"petani, peternak, spiritualis, seniman, dokter, guru, kyai, pemimpin"},
+            8:{lambang:"Tungkak", daftar:"guru, dosen, peternak, pengusaha bidang pertanahan dan bangunan"}
+        };
+        function pekerjaanDariNeptu(neptu){
+            const sisa = neptu % 8 || 8;
+            return PEKERJAAN_LAMBANG[sisa];
         }
 
         /* ===== Narasi & saran ===== */
         function kategoriDariTotal(total){
             for (const k of KATEGORI) if (k.keys.includes(total)) return k;
             return {name:"(Tidak Diketahui)", html:"Penentuan kategori untuk total ini belum tersedia."};
+        }
+        /* Skor kecocokan per kategori (perkiraan, untuk dibagikan) */
+        const SKOR_KATEGORI = {Pegat:40, Ratu:95, Jodoh:90, Topo:60, Tinari:88, Padu:65, Sujanan:45, Pesthi:92};
+        function skorDariKategori(nama){
+            for (const k in SKOR_KATEGORI) if (nama.includes(k)) return SKOR_KATEGORI[k];
+            return null;
         }
         function gabunganKarakter(h, p){
             const hTone = {Minggu:"mandiri & ekspresif", Senin:"tenang & terukur", Selasa:"tegas & berani", Rabu:"logis & komunikatif", Kamis:"bijak & rapi", Jumat:"hangat & kooperatif", Sabtu:"setia & konsisten"}[h];
@@ -422,6 +547,14 @@
             push('Jumat Legi', 'Hari yang populer untuk memulai usaha, hajatan, atau keputusan besar.');
             return out;
         }
+        function saranAktivitas(){
+            const out = [];
+            const push = (h, alasan)=>out.push(`<li><strong>${h}</strong> — ${alasan}</li>`);
+            push("Kamis Pon", "<strong>Pindah rumah:</strong> stabil dan tertata, baik untuk menempati rumah baru.");
+            push("Rabu Pahing", "<strong>Buka usaha:</strong> pikiran jernih dan niat kuat, baik untuk memulai usaha atau dagang.");
+            push("Minggu Pahing", "<strong>Perjalanan jauh:</strong> energi kuat dan berani, baik untuk perjalanan atau pindah kota.");
+            return out;
+        }
 
         /* ===== Mode hitung ===== */
         let modeHitung = 'pasangan';
@@ -440,13 +573,58 @@
         document.getElementById('modePasangan').addEventListener('click', ()=>setMode('pasangan'));
         document.getElementById('modeSingle').addEventListener('click', ()=>setMode('single'));
 
+        /* ===== Riwayat perhitungan (localStorage) ===== */
+        const RIWAYAT_KEY = 'wetonRiwayat';
+        function bacaRiwayat(){ try{ return JSON.parse(localStorage.getItem(RIWAYAT_KEY)) || []; }catch(e){ return []; } }
+        function simpanRiwayat(entri){
+            try{
+                const list = bacaRiwayat();
+                list.unshift(entri);
+                localStorage.setItem(RIWAYAT_KEY, JSON.stringify(list.slice(0,8)));
+            }catch(e){}
+        }
+        function renderRiwayat(){
+            const list = bacaRiwayat();
+            const wrap = document.getElementById('riwayatWrap');
+            if (!list.length){ wrap.classList.add('hidden'); return; }
+            wrap.classList.remove('hidden');
+            document.getElementById('riwayatList').innerHTML = list.map((r,i)=>{
+                const label = r.single ? r.nama1 : (r.nama1 + ' & ' + r.nama2);
+                const hasil = r.single ? (r.weton1 + ' (neptu ' + r.neptu1 + ')') : ('Total ' + r.total + ' — ' + r.kat);
+                return '<button type="button" data-i="' + i + '" class="riwayat-item w-full text-left p-3 rounded-lg border bg-white/80 text-sm"><strong>' + label + '</strong><br/><span class="opacity-80">' + hasil + '</span><br/><span class="text-xs opacity-60">' + r.ts + '</span></button>';
+            }).join('');
+        }
+        document.getElementById('riwayatList').addEventListener('click', (e)=>{
+            const btn = e.target.closest('.riwayat-item');
+            if (!btn) return;
+            const r = bacaRiwayat()[Number(btn.dataset.i)];
+            if (!r) return;
+            setMode(r.single ? 'single' : 'pasangan');
+            document.getElementById('namaPria').value = r.nama1 || '';
+            document.getElementById('tglPria').value = r.tgl1 || '';
+            document.getElementById('magribPria').checked = !!r.magrib1;
+            if (!r.single){
+                document.getElementById('namaWanita').value = r.nama2 || '';
+                document.getElementById('tglWanita').value = r.tgl2 || '';
+                document.getElementById('magribWanita').checked = !!r.magrib2;
+            }
+            document.getElementById('wetonForm').scrollIntoView({behavior:'smooth'});
+        });
+        document.getElementById('btnHapusRiwayat').addEventListener('click', ()=>{
+            try{ localStorage.removeItem(RIWAYAT_KEY); }catch(e){}
+            renderRiwayat();
+        });
+        renderRiwayat();
+
         /* ===== Helper ===== */
         const $ = s=>document.querySelector(s);
         document.getElementById('btnReset').addEventListener('click', ()=>{
             $('#wetonForm').reset(); $('#hasil').classList.add('hidden'); unityBridge('showAd');
             $('#dataPria').innerHTML = ''; $('#dataWanita').innerHTML = '';
             $('#kecocokan').innerHTML = ''; $('#analisaKombinasi').innerHTML = '';
-            $('#saranHari').innerHTML = ''; $('#saranPribadi').innerHTML = ''; $('#shareHint').textContent = '';
+            $('#saranHari').innerHTML = ''; $('#saranPribadi').innerHTML = '';
+            $('#saranAktivitas').innerHTML = ''; $('#saranAktivitasPribadi').innerHTML = '';
+            $('#ratingPrompt').classList.add('hidden'); $('#shareHint').textContent = '';
         });
 
         /* ===== SUBMIT: render hasil ===== */
@@ -464,8 +642,10 @@
                 return;
             }
 
-            // Hitung & render
-            const pria = hitungWetonFromInput(tPria);
+            // Hitung & render (opsi Magrib: hari Jawa berganti setelah 18.00)
+            const magribPria = document.getElementById('magribPria').checked;
+            const magribWanita = single ? false : document.getElementById('magribWanita').checked;
+            const pria = hitungWetonFromInput(tPria, magribPria);
             $('#judulDataPria').textContent = single ? '👤 Data Diri' : '👤 Data Pria';
             $('#kolomDataWanita').classList.toggle('hidden', single);
 
@@ -473,11 +653,17 @@
                 <div><strong>Nama:</strong> ${namaPria}</div>
                 <div><strong>Weton:</strong> ${pria.hari} ${pria.pasaran}</div>
                 <div><strong>Neptu:</strong> ${pria.neptu}</div>
+                <div><strong>Wuku:</strong> ${pria.wuku.nama} — ${pria.wuku.karakter}</div>
+                <div><strong>Pancasuda:</strong> ${pria.pancasuda.nama} — ${pria.pancasuda.makna}</div>
+                <div><strong>Pekerjaan cocok:</strong> ${pria.pekerjaan.lambang} — ${pria.pekerjaan.daftar}</div>
+                ${magribPria ? '<div class="text-xs opacity-70">Lahir setelah Magrib — weton mengikuti hari Jawa berikutnya.</div>' : ''}
                 <div class="mt-1">${karakterLengkap(pria)}</div>`;
 
             if (single){
                 const saranSingle = saranHariPribadi(pria);
+                const saranAkt = saranAktivitas();
                 $('#saranPribadi').innerHTML = saranSingle.join('');
+                $('#saranAktivitasPribadi').innerHTML = saranAkt.join('');
                 $('#bagianJodoh').classList.add('hidden');
                 $('#bagianPribadi').classList.remove('hidden');
                 $('#hasil').classList.remove('hidden');
@@ -485,12 +671,16 @@
                 window._ringkasanText =
                     `Kalkulator Weton\n\n`+
                     `${namaPria} (${pria.hari} ${pria.pasaran}, neptu ${pria.neptu})\n`+
-                    `Saran Hari Baik: ` + saranSingle.map(li => li.replace(/<[^>]+>/g,'')).join(' | ');
+                    `Wuku: ${pria.wuku.nama} • Pancasuda: ${pria.pancasuda.nama} • Pekerjaan cocok: ${pria.pekerjaan.daftar}\n`+
+                    `Saran Hari Baik: ` + saranSingle.map(li => li.replace(/<[^>]+>/g,'')).join(' | ') + `\n` +
+                    `Saran Hari Lainnya: ` + saranAkt.map(li => li.replace(/<[^>]+>/g,'')).join(' | ');
+                simpanRiwayat({single:true, nama1:namaPria, tgl1:tPria, magrib1:magribPria, weton1:pria.hari + ' ' + pria.pasaran, neptu1:pria.neptu, ts:new Date().toLocaleString('id-ID')});
+                renderRiwayat();
                 // 🔸 Tampilkan iklan interstitial setelah klik Proses
                 unityBridge('showAd');
                 return;
             }
-            const wanita = hitungWetonFromInput(tWanita);
+            const wanita = hitungWetonFromInput(tWanita, magribWanita);
             const total = pria.neptu + wanita.neptu;
             const kat = kategoriDariTotal(total);
 
@@ -498,12 +688,18 @@
                 <div><strong>Nama:</strong> ${namaWanita}</div>
                 <div><strong>Weton:</strong> ${wanita.hari} ${wanita.pasaran}</div>
                 <div><strong>Neptu:</strong> ${wanita.neptu}</div>
+                <div><strong>Wuku:</strong> ${wanita.wuku.nama} — ${wanita.wuku.karakter}</div>
+                <div><strong>Pancasuda:</strong> ${wanita.pancasuda.nama} — ${wanita.pancasuda.makna}</div>
+                <div><strong>Pekerjaan cocok:</strong> ${wanita.pekerjaan.lambang} — ${wanita.pekerjaan.daftar}</div>
+                ${magribWanita ? '<div class="text-xs opacity-70">Lahir setelah Magrib — weton mengikuti hari Jawa berikutnya.</div>' : ''}
                 <div class="mt-1">${karakterLengkap(wanita)}</div>`;
 
+            const skor = skorDariKategori(kat.name);
             $('#kecocokan').innerHTML = `
                 <div class="font-semibold">${kat.name}</div>
                 <div class="mt-2">${kat.html}</div>
-                <div class="mt-2"><strong>Total Neptu:</strong> ${total}</div>`;
+                <div class="mt-2"><strong>Total Neptu:</strong> ${total}</div>
+                <div class="mt-1"><strong>Skor Kecocokan:</strong> ${skor}% <span class="text-xs opacity-70">(perkiraan)</span></div>`;
 
             const duet = `${pria.pasaran}-${wanita.pasaran}`;
             const analisaKhusus = KOMBO_SPESIFIK[duet] ||
@@ -511,7 +707,9 @@
             $('#analisaKombinasi').innerHTML = `<p><strong>${pria.pasaran} + ${wanita.pasaran}</strong>: ${analisaKhusus}</p>`;
 
             const saran = buatSaranHari(pria, wanita, total);
+            const saranAkt = saranAktivitas();
             $('#saranHari').innerHTML = saran.join('');
+            $('#saranAktivitas').innerHTML = saranAkt.join('');
 
             $('#bagianJodoh').classList.remove('hidden');
             $('#bagianPribadi').classList.add('hidden');
@@ -520,10 +718,15 @@
 
             window._ringkasanText =
                 `Kalkulator Weton\n\n`+
-                `Pria: ${namaPria} (${pria.hari} ${pria.pasaran}, neptu ${pria.neptu})\n`+
-                `Wanita: ${namaWanita} (${wanita.hari} ${wanita.pasaran}, neptu ${wanita.neptu})\n`+
+                `Pria: ${namaPria} (${pria.hari} ${pria.pasaran}, neptu ${pria.neptu}) — Wuku ${pria.wuku.nama}, Pancasuda ${pria.pancasuda.nama}\n`+
+                `Wanita: ${namaWanita} (${wanita.hari} ${wanita.pasaran}, neptu ${wanita.neptu}) — Wuku ${wanita.wuku.nama}, Pancasuda ${wanita.pancasuda.nama}\n`+
                 `Total Neptu: ${total} → ${kat.name}\n`+
-                `Saran Hari: ` + saran.map(li => li.replace(/<[^>]+>/g,'')).join(' | ');
+                `Skor Kecocokan: ${skor}% (perkiraan)\n`+
+                `Saran Hari: ` + saran.map(li => li.replace(/<[^>]+>/g,'')).join(' | ') + `\n` +
+                `Saran Hari Lainnya: ` + saranAkt.map(li => li.replace(/<[^>]+>/g,'')).join(' | ');
+
+            simpanRiwayat({single:false, nama1:namaPria, nama2:namaWanita, tgl1:tPria, tgl2:tWanita, magrib1:magribPria, magrib2:magribWanita, total:total, kat:kat.name, ts:new Date().toLocaleString('id-ID')});
+            renderRiwayat();
 
             // 🔸 Tampilkan iklan interstitial setelah klik Proses
             unityBridge('showAd');
@@ -597,19 +800,34 @@
             try{
                 const pdf = await exportToPDFMultiPage(node);
                 pdf.save('hasil-weton.pdf');
+                tampilkanPromptRating();
                 // 🔸 Tampilkan iklan setelah berhasil unduh PDF
                 unityBridge('showAd');
             }catch(e){ console.error(e); alert('Gagal membuat PDF. Coba lagi.'); }
+        });
+
+        /* ===== Prompt rating (tampil sekali per perangkat, setelah berbagi) ===== */
+        function tampilkanPromptRating(){
+            try{ if (localStorage.getItem('wetonRatingDitanya')) return; }catch(e){}
+            document.getElementById('ratingPrompt').classList.remove('hidden');
+        }
+        document.getElementById('btnRatingNanti').addEventListener('click', ()=>{
+            document.getElementById('ratingPrompt').classList.add('hidden');
+            try{ localStorage.setItem('wetonRatingDitanya','1'); }catch(e){}
+        });
+        document.getElementById('btnRatingBeri').addEventListener('click', ()=>{
+            try{ localStorage.setItem('wetonRatingDitanya','1'); }catch(e){}
         });
 
         /* ===== Share ===== */
         document.getElementById('btnShare').addEventListener('click', async ()=>{
             const text = window._ringkasanText || 'Hasil belum dihitung.';
             if (navigator.share){
-                try{ await navigator.share({title:'Hasil Kalkulator Weton', text}); return; }catch(e){}
+                try{ await navigator.share({title:'Hasil Kalkulator Weton', text}); tampilkanPromptRating(); return; }catch(e){}
             }
             await navigator.clipboard.writeText(text);
             document.getElementById('shareHint').textContent = 'Ringkasan disalin ke clipboard. Tempel di chat pilihan Anda.';
+            tampilkanPromptRating();
         });
         document.getElementById('btnWA').addEventListener('click', ()=>{
             const text = encodeURIComponent(window._ringkasanText || 'Hasil belum dihitung.');
@@ -619,7 +837,56 @@
                 navigator.clipboard.writeText(window._ringkasanText || '');
                 document.getElementById('shareHint').textContent = 'Tautan WhatsApp diblokir. Ringkasan disalin—tempel manual di WhatsApp.';
             }
+            tampilkanPromptRating();
         });
+        document.getElementById('btnCopy').addEventListener('click', async ()=>{
+            const text = window._ringkasanText || 'Hasil belum dihitung.';
+            try{
+                await navigator.clipboard.writeText(text);
+                document.getElementById('shareHint').textContent = 'Ringkasan disalin ke clipboard.';
+                tampilkanPromptRating();
+            }catch(e){
+                document.getElementById('shareHint').textContent = 'Gagal menyalin. Coba tombol Bagikan.';
+            }
+        });
+        document.getElementById('btnGambar').addEventListener('click', async ()=>{
+            const node = document.getElementById('hasilCard');
+            if (!node){ alert('Hitung hasil dulu ya.'); return; }
+            try{
+                await new Promise(r=>requestAnimationFrame(r));
+                node.classList.add('pdf-stable');
+                const prevScrollY = window.scrollY; window.scrollTo(0,0);
+                const canvas = await html2canvas(node, {
+                    scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false,
+                    windowWidth: document.documentElement.scrollWidth,
+                    windowHeight: document.documentElement.scrollHeight
+                });
+                window.scrollTo(0, prevScrollY);
+                node.classList.remove('pdf-stable');
+                const blob = await new Promise(res=>canvas.toBlob(res, 'image/png'));
+                if (!blob) throw new Error('blob kosong');
+                const file = new File([blob], 'hasil-weton.png', {type:'image/png'});
+                if (navigator.canShare && navigator.canShare({files:[file]})){
+                    await navigator.share({files:[file], title:'Hasil Kalkulator Weton'});
+                    tampilkanPromptRating();
+                    return;
+                }
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob); a.download = 'hasil-weton.png'; a.click();
+                setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+                document.getElementById('shareHint').textContent = 'Gambar hasil diunduh sebagai hasil-weton.png — bisa dibagikan ke WhatsApp / Instagram.';
+                tampilkanPromptRating();
+                unityBridge('showAd');
+            }catch(e){ console.error(e); alert('Gagal membuat gambar. Coba lagi.'); }
+        });
+
+        /* ===== Weton Hari Ini ===== */
+        (function(){
+            const now = new Date();
+            const w = hitungWetonAkurat(now.getFullYear(), now.getMonth()+1, now.getDate());
+            document.getElementById('wetonHariIniIsi').textContent = w.hari + ' ' + w.pasaran + ' • Neptu ' + w.neptu + ' • Wuku ' + w.wuku.nama;
+            document.getElementById('wetonHariIniTgl').textContent = now.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+        })();
     </script>
 </body>
 </html>
