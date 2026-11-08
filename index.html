@@ -71,6 +71,8 @@
         .btn-out{ border:1px solid var(--coklat-700); color: var(--coklat-700); }
         .btn-out:hover{ background: var(--coklat-700); color:#fff; }
 
+        .kal-cell:hover{ background:#f7f2ee; }
+
         .icon-btn{
             width:40px; height:40px; display:grid; place-items:center; border-radius:999px;
             border:1px solid rgba(61,43,31,.2); background:#fff;
@@ -257,6 +259,22 @@
                 </div>
             </div>
             <p id="shareHint" class="mt-2 text-xs opacity-70"></p>
+        </section>
+
+        <!-- KALENDER JAWA -->
+        <section id="kalender" class="mt-6 mb-8">
+            <h3 class="font-bold text-lg text-center" style="color:var(--coklat-900)">📆 Kalender Jawa</h3>
+            <div class="mt-2 flex items-center justify-between">
+                <button id="kalPrev" type="button" class="icon-btn" aria-label="Bulan sebelumnya">‹</button>
+                <div id="kalJudul" class="font-bold text-base"></div>
+                <button id="kalNext" type="button" class="icon-btn" aria-label="Bulan berikutnya">›</button>
+            </div>
+            <div class="mt-2 text-center"><button id="kalHariIni" type="button" class="text-xs font-semibold btn-out px-3 py-1 rounded-full">Hari ini</button></div>
+            <div class="mt-3 grid grid-cols-7 gap-1 text-center text-xs font-semibold opacity-70">
+                <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+            </div>
+            <div id="kalGrid" class="mt-1 grid grid-cols-7 gap-1"></div>
+            <div id="kalDetail" class="mt-3 kartu-batik p-4 relative z-10 text-sm"></div>
         </section>
     </div>
 
@@ -877,6 +895,63 @@
                 unityBridge('showAd');
             }catch(e){ console.error(e); alert('Gagal membuat gambar. Coba lagi.'); }
         });
+
+        /* ===== Kalender Jawa bulanan ===== */
+        const NAMA_BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        let kalTahun, kalBulan, kalPilih; // kalBulan 1-12
+        function kalRender(){
+            document.getElementById('kalJudul').textContent = NAMA_BULAN[kalBulan-1] + ' ' + kalTahun;
+            const hariPertama = new Date(Date.UTC(kalTahun, kalBulan-1, 1)).getUTCDay();
+            const jmlHari = new Date(Date.UTC(kalTahun, kalBulan, 0)).getUTCDate();
+            const now = new Date();
+            const hariIni = (kalTahun === now.getFullYear() && kalBulan === now.getMonth()+1) ? now.getDate() : -1;
+            let cells = '';
+            for (let i=0; i<hariPertama; i++) cells += '<div></div>';
+            for (let d=1; d<=jmlHari; d++){
+                const w = hitungWetonAkurat(kalTahun, kalBulan, d);
+                const isToday = d === hariIni;
+                const isSel = kalPilih === d;
+                const border = isSel ? '2px solid var(--amber)' : '1px solid transparent';
+                const bg = isToday ? 'var(--amber)' : 'transparent';
+                cells += '<button type="button" data-d="' + d + '" class="kal-cell" style="padding:4px 2px;border-radius:10px;border:' + border + ';background:' + bg + ';cursor:pointer"><div style="font-size:14px;font-weight:' + (isSel ? '700' : '400') + '">' + d + '</div><div style="font-size:10px;line-height:1.2;opacity:.7">' + w.pasaran + '</div></button>';
+            }
+            document.getElementById('kalGrid').innerHTML = cells;
+            kalDetail();
+        }
+        function kalDetail(){
+            const w = hitungWetonAkurat(kalTahun, kalBulan, kalPilih);
+            const hariNama = HARI[new Date(Date.UTC(kalTahun, kalBulan-1, kalPilih)).getUTCDay()];
+            document.getElementById('kalDetail').innerHTML =
+                '<div class="font-bold">' + hariNama + ', ' + kalPilih + ' ' + NAMA_BULAN[kalBulan-1] + ' ' + kalTahun + '</div>' +
+                '<div class="mt-1"><strong>Weton:</strong> ' + w.hari + ' ' + w.pasaran + ' • <strong>Neptu:</strong> ' + w.neptu + '</div>' +
+                '<div><strong>Wuku:</strong> ' + w.wuku.nama + ' — ' + w.wuku.karakter + '</div>' +
+                '<div><strong>Pancasuda:</strong> ' + w.pancasuda.nama + ' — ' + w.pancasuda.makna + '</div>' +
+                '<div><strong>Pekerjaan cocok:</strong> ' + w.pekerjaan.lambang + ' — ' + w.pekerjaan.daftar + '</div>';
+        }
+        document.getElementById('kalGrid').addEventListener('click', (e)=>{
+            const btn = e.target.closest('.kal-cell');
+            if (!btn) return;
+            kalPilih = Number(btn.dataset.d);
+            kalRender();
+        });
+        document.getElementById('kalPrev').addEventListener('click', ()=>{
+            kalBulan--; if (kalBulan < 1){ kalBulan = 12; kalTahun--; }
+            kalPilih = 1; kalRender();
+        });
+        document.getElementById('kalNext').addEventListener('click', ()=>{
+            kalBulan++; if (kalBulan > 12){ kalBulan = 1; kalTahun++; }
+            kalPilih = 1; kalRender();
+        });
+        document.getElementById('kalHariIni').addEventListener('click', ()=>{
+            const now = new Date();
+            kalTahun = now.getFullYear(); kalBulan = now.getMonth()+1; kalPilih = now.getDate();
+            kalRender();
+        });
+        (function(){
+            const now = new Date();
+            kalTahun = now.getFullYear(); kalBulan = now.getMonth()+1; kalPilih = now.getDate();
+            kalRender();
+        })();
 
         /* ===== Weton Hari Ini ===== */
         (function(){
