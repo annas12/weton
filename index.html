@@ -138,15 +138,17 @@
             </div>
         </header>
 
+        <!-- MENU -->
+        <div class="mt-3 grid grid-cols-2 gap-2">
+            <button type="button" id="menuKalkulator" class="px-4 py-2 rounded-lg text-sm font-semibold btn-coklat">🧮 Kalkulator Weton</button>
+            <button type="button" id="menuKalender" class="px-4 py-2 rounded-lg text-sm font-semibold btn-out">📆 Kalender Jawa</button>
+        </div>
+
+        <div id="viewKalkulator">
         <!-- MODE -->
         <div class="mt-3 flex justify-center gap-2">
             <button type="button" id="modePasangan" class="px-5 py-2 rounded-full text-sm font-semibold btn-coklat">💑 Pasangan</button>
             <button type="button" id="modeSingle" class="px-5 py-2 rounded-full text-sm font-semibold btn-out">👤 Satu Orang</button>
-        </div>
-
-        <!-- WETON HARI INI (ringkas, satu baris) -->
-        <div class="mt-3 kartu-batik px-3 py-2 text-center relative z-10">
-            <span class="text-xs opacity-70">Weton Hari Ini: </span><span id="wetonHariIniIsi" class="text-sm font-bold" style="color:var(--coklat-900)">…</span>
         </div>
 
         <!-- FORM -->
@@ -260,7 +262,9 @@
             </div>
             <p id="shareHint" class="mt-2 text-xs opacity-70"></p>
         </section>
+        </div>
 
+        <div id="viewKalender" class="hidden">
         <!-- KALENDER JAWA -->
         <section id="kalender" class="mt-6 mb-8">
             <h3 class="font-bold text-lg text-center" style="color:var(--coklat-900)">📆 Kalender Jawa</h3>
@@ -276,6 +280,7 @@
             <div id="kalGrid" class="mt-1 grid grid-cols-7 gap-1"></div>
             <div id="kalDetail" class="mt-3 kartu-batik p-4 relative z-10 text-sm"></div>
         </section>
+        </div>
     </div>
 
     <script>
@@ -953,12 +958,20 @@
             kalRender();
         })();
 
-        /* ===== Weton Hari Ini ===== */
-        (function(){
-            const now = new Date();
-            const w = hitungWetonAkurat(now.getFullYear(), now.getMonth()+1, now.getDate());
-            document.getElementById('wetonHariIniIsi').textContent = w.hari + ' ' + w.pasaran + ' • Neptu ' + w.neptu + ' • Wuku ' + w.wuku.nama;
-        })();
+        /* ===== Menu tampilan: Kalkulator / Kalender ===== */
+        let viewAktif = 'kalkulator';
+        function setView(view){
+            viewAktif = view;
+            const kalk = view === 'kalkulator';
+            document.getElementById('viewKalkulator').classList.toggle('hidden', !kalk);
+            document.getElementById('viewKalender').classList.toggle('hidden', kalk);
+            document.getElementById('menuKalkulator').className = 'px-4 py-2 rounded-lg text-sm font-semibold ' + (kalk ? 'btn-coklat' : 'btn-out');
+            document.getElementById('menuKalender').className = 'px-4 py-2 rounded-lg text-sm font-semibold ' + (kalk ? 'btn-out' : 'btn-coklat');
+            if (!kalk) kalRender();
+            window.scrollTo(0,0);
+        }
+        document.getElementById('menuKalkulator').addEventListener('click', ()=>setView('kalkulator'));
+        document.getElementById('menuKalender').addEventListener('click', ()=>setView('kalender'));
     </script>
 </body>
 </html>
