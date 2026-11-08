@@ -142,11 +142,9 @@
             <button type="button" id="modeSingle" class="px-5 py-2 rounded-full text-sm font-semibold btn-out">👤 Satu Orang</button>
         </div>
 
-        <!-- WETON HARI INI -->
-        <div class="mt-3 kartu-batik p-4 text-center relative z-10">
-            <div class="text-xs opacity-70">Weton Hari Ini</div>
-            <div id="wetonHariIniIsi" class="font-bold text-lg" style="color:var(--coklat-900)">…</div>
-            <div id="wetonHariIniTgl" class="text-xs opacity-70"></div>
+        <!-- WETON HARI INI (ringkas, satu baris) -->
+        <div class="mt-3 kartu-batik px-3 py-2 text-center relative z-10">
+            <span class="text-xs opacity-70">Weton Hari Ini: </span><span id="wetonHariIniIsi" class="text-sm font-bold" style="color:var(--coklat-900)">…</span>
         </div>
 
         <!-- FORM -->
@@ -885,7 +883,6 @@
             const now = new Date();
             const w = hitungWetonAkurat(now.getFullYear(), now.getMonth()+1, now.getDate());
             document.getElementById('wetonHariIniIsi').textContent = w.hari + ' ' + w.pasaran + ' • Neptu ' + w.neptu + ' • Wuku ' + w.wuku.nama;
-            document.getElementById('wetonHariIniTgl').textContent = now.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
         })();
     </script>
 </body>
